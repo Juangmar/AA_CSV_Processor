@@ -14,10 +14,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import business.Processor;
 
 public class FileChooser extends JFrame {
 
@@ -88,7 +88,7 @@ public class FileChooser extends JFrame {
 		go.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				execute();
 			}
 		});
 		
@@ -160,7 +160,6 @@ public class FileChooser extends JFrame {
 	private void showAbout(String title) {
 		JFrame about = new JFrame(title);
 		about.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		JPanel panel = new JPanel();
 		JTextPane area = new JTextPane();
 		
 		area.setEditable(false);
@@ -194,6 +193,20 @@ public class FileChooser extends JFrame {
 		about.setSize(320,350);
 		about.setResizable(false);
 		about.setVisible(true);
+	}
+	
+	private void execute() {
+		if(!files.isEmpty()) {
+			Processor controller = new Processor();
+			try {
+				controller.compute(files);
+			} catch (Exception e) {
+				//Show error
+				e.printStackTrace();
+			}
+		} else {
+			//Show warning
+		}
 	}
 
 }
