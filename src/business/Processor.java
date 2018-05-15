@@ -1,7 +1,12 @@
 package business;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 
 public class Processor {
@@ -39,16 +44,43 @@ public class Processor {
 		String[][] data = new String[lines.length][3];
 		int lastInd = 0;
 		for (String ex : lines) {
-			if(!ex.equals("") && !ex.equals("COMMENT_ID,AUTHOR,DATE,CONTENT,CLASS")) {
-				String[] fields = ex.split(",");
-				data[lastInd][0] = fields[1];
-				data[lastInd][2] = fields[fields.length-1];
-				String[] content = ex.split("\"");
-				data[lastInd][1] = content[1];
-				lastInd++;
+			if(!ex.equals("") && !ex.split(",")[0].equals("COMMENT_ID")) {
+				if(ex.split("\"").length>3) {
+					String[] fields = ex.split(",");
+					data[lastInd][0] = fields[1];
+					data[lastInd][2] = fields[fields.length-1];
+					String[] content = ex.split("\"");
+					data[lastInd][1] = content[3];
+					lastInd++;
+				} else {
+					String[] fields = ex.split(",");
+					data[lastInd][0] = fields[1];
+					data[lastInd][2] = fields[fields.length-1];
+					data[lastInd][1] = fields[3];
+					lastInd++;
+				}
+				
 			}
 		}
-		return false;
+		return save(lastInd, e.get(0).getParent(), data);
+	}
+
+	private boolean save(int lastInd, String path, String[][] data) {
+		boolean result = false;
+		String totalPath = path + "result.csv";
+		File save = new File(totalPath);
+		try {
+			BufferedWriter output = new BufferedWriter(new FileWriter(save));
+			for (int i = 0; i < lastInd; i++) {
+				output.write(data[i][0] + "," + data[i][1] + "," + data[i][2] + "\n");
+			}
+			output.close();
+			result = true;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return result;
 	}
 	
 }
