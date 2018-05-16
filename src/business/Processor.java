@@ -3,8 +3,6 @@ package business;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,7 +11,7 @@ public class Processor {
 
 	public Processor() {}
 	
-	public boolean compute(HashMap<Integer, File> e) throws Exception {
+	public File compute(HashMap<Integer, File> e) throws Exception {
 		final String comas = ";;;;;;;;;;;;;\r\n";
 		final String r = "\r";
 		final String n = "\n";
@@ -48,14 +46,14 @@ public class Processor {
 				if(ex.split("\"").length>3) {
 					String[] fields = ex.split(",");
 					data[lastInd][0] = fields[1];
-					data[lastInd][2] = fields[fields.length-1];
+					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "");
 					String[] content = ex.split("\"");
 					data[lastInd][1] = content[3];
 					lastInd++;
 				} else {
 					String[] fields = ex.split(",");
 					data[lastInd][0] = fields[1];
-					data[lastInd][2] = fields[fields.length-1];
+					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "");
 					data[lastInd][1] = fields[3];
 					lastInd++;
 				}
@@ -65,22 +63,24 @@ public class Processor {
 		return save(lastInd, e.get(0).getParent(), data);
 	}
 
-	private boolean save(int lastInd, String path, String[][] data) {
-		boolean result = false;
-		String totalPath = path + "result.csv";
-		File save = new File(totalPath);
+	private File save(int lastInd, String path, String[][] data) {
+		if(lastInd==0||path==""||data==null) return null;
+		
+		File save = null;
+		String totalPath = path + "_result.csv";
+		save = new File(totalPath);
 		try {
 			BufferedWriter output = new BufferedWriter(new FileWriter(save));
 			for (int i = 0; i < lastInd; i++) {
-				output.write(data[i][0] + "," + data[i][1] + "," + data[i][2] + "\n");
+				output.write(data[i][0] + "|" + data[i][1] + "|" + data[i][2] + "\n");
 			}
 			output.close();
-			result = true;
+			return save;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
+			return null;
 		}
-		return result;
 	}
 	
 }

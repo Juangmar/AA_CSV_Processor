@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -199,7 +200,8 @@ public class FileChooser extends JFrame {
 		if(!files.isEmpty()) {
 			Processor controller = new Processor();
 			try {
-				controller.compute(files);
+				File file = controller.compute(files);
+				if(file!=null) JOptionPane.showMessageDialog(this, "File saved:\n" + file.getAbsolutePath());
 			} catch (Exception e) {
 				//Show error
 				e.printStackTrace();
