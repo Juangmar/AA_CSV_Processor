@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Processor {
 
@@ -39,6 +41,8 @@ public class Processor {
 		}
 		String[] lines = all.split(n);
 		
+		List<String> vocab = new ArrayList<>();
+		
 		String[][] data = new String[lines.length][3];
 		int lastInd = 0;
 		for (String ex : lines) {
@@ -48,19 +52,51 @@ public class Processor {
 					data[lastInd][0] = fields[1];
 					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "");
 					String[] content = ex.split("\"");
-					data[lastInd][1] = content[3];
+					data[lastInd][1] = content[3].toLowerCase();
 					lastInd++;
+					computeVocab(content[3].toLowerCase(), vocab);
 				} else {
 					String[] fields = ex.split(",");
 					data[lastInd][0] = fields[1];
 					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "");
-					data[lastInd][1] = fields[3];
+					data[lastInd][1] = fields[3].toLowerCase();
 					lastInd++;
+					computeVocab(fields[3].toLowerCase(), vocab);
 				}
 				
 			}
 		}
+		writeVocab(vocab, e.get(0).getParent());
 		return save(lastInd, e.get(0).getParent(), data);
+	}
+
+	private void computeVocab(String message, List<String> vocab) {
+		String[] words = message.split(" ");
+		for(String word : words) {
+			String processedWord = word.replaceAll("\"", "").replaceAll(":", "").replaceAll(",", "").replaceAll("!", "");
+			if(!vocab.contains(processedWord)&&!word.equals("")) vocab.add(processedWord);
+		}
+	}
+	
+	private void writeVocab(List<String> vocab, String path) throws IOException {
+		java.util.Collections.sort(vocab);
+		
+		File save = null;
+		String totalPath = path + "vocab.txt";
+		save = new File(totalPath);
+		try {
+			BufferedWriter output = new BufferedWriter(new FileWriter(save));
+			for (int i = 1; i < vocab.size(); i++) {
+				output.write(i + "\t" + vocab.get(i) + "\n");
+			}
+			output.close();
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			throw new IOException("Cannot write");
+		}
+		
+
 	}
 
 	private File save(int lastInd, String path, String[][] data) {
