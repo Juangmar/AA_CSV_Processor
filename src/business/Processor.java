@@ -50,18 +50,18 @@ public class Processor {
 				if(ex.split("\"").length>3) {
 					String[] fields = ex.split(",");
 					data[lastInd][0] = fields[1];
-					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "");
+					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "").replaceAll("\"", "");
 					String[] content = ex.split("\"");
-					data[lastInd][1] = content[3].toLowerCase();
+					data[lastInd][1] = content[3].toLowerCase().replaceAll(";","");
 					lastInd++;
-					computeVocab(content[3].toLowerCase(), vocab);
+					if(data[lastInd-1][2].equals("1"))computeVocab(content[3].toLowerCase(), vocab);
 				} else {
 					String[] fields = ex.split(",");
 					data[lastInd][0] = fields[1];
-					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "");
-					data[lastInd][1] = fields[3].toLowerCase();
+					data[lastInd][2] = fields[fields.length-1].replaceAll(";", "").replace("\"","");
+					data[lastInd][1] = fields[3].toLowerCase().replaceAll(";", "");
 					lastInd++;
-					computeVocab(fields[3].toLowerCase(), vocab);
+					if(data[lastInd-1][2].equals("1"))computeVocab(fields[3].toLowerCase(), vocab);
 				}
 				
 			}
@@ -86,8 +86,9 @@ public class Processor {
 		save = new File(totalPath);
 		try {
 			BufferedWriter output = new BufferedWriter(new FileWriter(save));
-			for (int i = 1; i < vocab.size(); i++) {
-				output.write(i + "\t" + vocab.get(i) + "\n");
+				output.write(1 + "\t" + vocab.get(1));
+			for (int i = 2; i < vocab.size(); i++) {
+				output.write("\n" + i + "\t" + vocab.get(i));
 			}
 			output.close();
 		} catch (IOException e) {
@@ -103,12 +104,12 @@ public class Processor {
 		if(lastInd==0||path==""||data==null) return null;
 		
 		File save = null;
-		String totalPath = path + "_result.csv";
+		String totalPath = path + "_result.txt";
 		save = new File(totalPath);
 		try {
 			BufferedWriter output = new BufferedWriter(new FileWriter(save));
 			for (int i = 0; i < lastInd; i++) {
-				output.write(data[i][0] + "|" + data[i][1] + "|" + data[i][2] + "\n");
+				output.write(data[i][0] + ";" + data[i][1] + ";" + data[i][2] + "\n");
 			}
 			output.close();
 			return save;
