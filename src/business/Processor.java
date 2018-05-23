@@ -73,7 +73,7 @@ public class Processor {
 	private void computeVocab(String message, List<String> vocab) {
 		String[] words = message.split(" ");
 		for(String word : words) {
-			String processedWord = word.replaceAll("\"", "").replaceAll(":", "").replaceAll(",", "").replaceAll("!", "");
+			String processedWord = word.replaceAll("\"", "").replaceAll(":", "").replaceAll(",", "").replaceAll("\\d", "").replaceAll("\\W", "").replaceAll("_", "");
 			if(!vocab.contains(processedWord)&&!word.equals("")) vocab.add(processedWord);
 		}
 	}
